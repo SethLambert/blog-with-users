@@ -31,7 +31,7 @@ db.init_app(app)
 
 ##CONFIGURE TABLES
 # check if table exist
-engine = create_engine("DATABASE_URL")
+engine = create_engine(os.environ.get("DATABASE_URL"))
 # if blog posts do not exist
 if not engine.dialect.has_table(engine, "blog_posts"):
     metadata = MetaData(engine)
