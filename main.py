@@ -30,48 +30,48 @@ db = SQLAlchemy()
 db.init_app(app)
 
 ##CONFIGURE TABLES
-# check if table exist
-engine = create_engine(os.environ.get("DATABASE_URL"))
-# if blog posts do not exist
-if not engine.dialect.has_table(engine, "blog_posts"):
-    metadata = MetaData(engine)
-    Table(
-        "blog_posts", 
-        metadata,
-        Column('id', Integer, primary_key=True),
-        Column('author', String(250), nullable=False),
-        Column('title', String(250), unique=True, nullable=False),
-        Column('subtitle', String(250), nullable=False),
-        Column('date', String(250), nullable=False),
-        Column('body', Text, nullable=False),
-        Column('img_url', String(250), nullable=False),
-        Column('author_id', Integer, ForeignKey("users.id")),
-        )
-    metadata.create_all()
-# if users do not exist
-if not engine.dialect.has_table(engine, "users"):
-    metadata = MetaData(engine)
-    Table(
-        "users", 
-        metadata,
-        Column('id', Integer, primary_key=True),
-        Column('email', String(100), unique=True),
-        Column('password', String(100)),
-        Column('name', String(100))
-        )
-    metadata.create_all()
-# if users do not exist
-if not engine.dialect.has_table(engine, "comments"):
-    metadata = MetaData(engine)
-    Table(
-        "comments", 
-        metadata,
-        Column('id', Integer, primary_key=True),
-        Column('text', Text, nullable=False),
-        Column('author_id', Integer, ForeignKey("users.id")),
-        Column('post_id', Integer, ForeignKey("blog_posts.id"))
-        )
-    metadata.create_all()    
+# # check if table exist
+# engine = create_engine(os.environ.get("DATABASE_URL"))
+# # if blog posts do not exist
+# if not engine.dialect.has_table(engine, "blog_posts"):
+#     metadata = MetaData(engine)
+#     Table(
+#         "blog_posts", 
+#         metadata,
+#         Column('id', Integer, primary_key=True),
+#         Column('author', String(250), nullable=False),
+#         Column('title', String(250), unique=True, nullable=False),
+#         Column('subtitle', String(250), nullable=False),
+#         Column('date', String(250), nullable=False),
+#         Column('body', Text, nullable=False),
+#         Column('img_url', String(250), nullable=False),
+#         Column('author_id', Integer, ForeignKey("users.id")),
+#         )
+#     metadata.create_all()
+# # if users do not exist
+# if not engine.dialect.has_table(engine, "users"):
+#     metadata = MetaData(engine)
+#     Table(
+#         "users", 
+#         metadata,
+#         Column('id', Integer, primary_key=True),
+#         Column('email', String(100), unique=True),
+#         Column('password', String(100)),
+#         Column('name', String(100))
+#         )
+#     metadata.create_all()
+# # if users do not exist
+# if not engine.dialect.has_table(engine, "comments"):
+#     metadata = MetaData(engine)
+#     Table(
+#         "comments", 
+#         metadata,
+#         Column('id', Integer, primary_key=True),
+#         Column('text', Text, nullable=False),
+#         Column('author_id', Integer, ForeignKey("users.id")),
+#         Column('post_id', Integer, ForeignKey("blog_posts.id"))
+#         )
+#     metadata.create_all()    
    
 #ORM classes    
 class BlogPost(db.Model):
@@ -105,7 +105,7 @@ class Comment(db.Model):
     post_id = db.Column(db.Integer, db.ForeignKey("blog_posts.id"))
     parent_post = relationship("BlogPost", back_populates="comments")
     
-#db.create_all()
+db.create_all()
 
 #user images
 gravatar = Gravatar(app, size=100, rating='g', default='retro', force_default=False, force_lower=False, use_ssl=False, base_url=None)
