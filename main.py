@@ -4,11 +4,13 @@ from flask_ckeditor import CKEditor
 from datetime import date
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Text, ForeignKey
 from sqlalchemy.orm import relationship
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
 from flask_gravatar import Gravatar
 from functools import wraps
+import psycopg2
 #from dotenv import load_dotenv
 import os
 
@@ -28,7 +30,60 @@ db = SQLAlchemy()
 db.init_app(app)
 
 ##CONFIGURE TABLES
-
+# check if table exist
+engine = create_engine("DATABASE_URL")
+# if blog posts do not exist
+if not engine.dialect.has_table(engine, "blog_posts"):
+    metadata = MetaData(engine)
+    Table(
+        "blog_posts", 
+        metadata,
+        Column(Integer, primary_key=True),
+        Column(String(250), nullable=False),
+        Column(String(250), unique=True, nullable=False),
+        Column(String(250), nullable=False),
+        Column(String(250), nullable=False),
+        Column(Text, nullable=False),
+        Column(String(250), nullable=False),
+        Column(Integer, ForeignKey("users.id")),
+        relationship("User", back_populates="posts"),
+        relationship("Comment", back_populates="parent_post")
+        )
+    metadata.create_all()
+# if users do not exist
+if not engine.dialect.has_table(engine, "users"):
+    metadata = MetaData(engine)
+    Table(
+        "users", 
+        metadata,
+        Column(Integer, primary_key=True),
+        Column(String(250), nullable=False),
+        Column(String(250), unique=True, nullable=False),
+        Column(String(250), nullable=False),
+        Column(String(250), nullable=False),
+        Column(Text, nullable=False),
+        Column(String(250), nullable=False),
+        Column(Integer, ForeignKey("users.id")),
+        relationship("User", back_populates="posts"),
+        relationship("Comment", back_populates="parent_post")
+        )
+    metadata.create_all()
+# if users do not exist
+if not engine.dialect.has_table(engine, "comments"):
+    metadata = MetaData(engine)
+    Table(
+        "comments", 
+        metadata,
+        Column(Integer, primary_key=True),
+        Column(Text, nullable=False),
+        Column(Integer, ForeignKey("users.id")),
+        relationship("User", back_populates="comments"),
+        Column(Integer, ForeignKey("blog_posts.id")),
+        relationship("BlogPost", back_populates="comments")
+        )
+    metadata.create_all()    
+   
+#ORM classes    
 class BlogPost(db.Model):
     __tablename__ = "blog_posts"
     id = db.Column(db.Integer, primary_key=True)
